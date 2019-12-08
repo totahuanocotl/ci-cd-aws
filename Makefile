@@ -6,14 +6,15 @@ ifdef VERSION
 	version := $(VERSION)
 else
 	git_rev := $(shell git rev-parse --short HEAD)
-	git_tag := $(shell git tag --points-at=$(git_rev) | grep "cni-migration-validator")
+	git_tag := $(shell git tag --points-at=$(git_rev))
 	version := $(if $(git_tag),$(git_tag),dev-$(git_rev))
 endif
 build_time := $(shell date -u)
 ldflags := -X "github.com/totahuanocotl/hello-world/cmd.version=$(version)" -X "github.com/totahuanocotl/hello-world/cmd.buildTime=$(build_time)"
+repo := 241776843775.dkr.ecr.eu-west-1.amazonaws.com/axiltia
+image :=  hello-world
 
-.phony: all setup clean build install check checkformat format vet lint test
-
+.phony: all setup clean build install check checkformat format vet lint test docker-build docker-push
 
 all : install check
 check : checkformat vet lint test
@@ -67,6 +68,15 @@ test: install
 	@echo "== test"
 	go test -race $(pkgs)
 
-docker:
-	@echo "== docker"
-	docker build -t local/hello-world .
+docker-build:
+	@echo "== docker-build"
+	docker build \
+	       -t local/$(image) \
+	       -t $(repo)/$(image):$(version) \
+	       .
+docker-push: docker-build
+	@echo "== docker-push"
+	@echo "Running 'aws ecr get-login' && docker push ..."
+	@LOGIN=$$(aws ecr get-login --no-include-email --region eu-west-1) && \
+	       $$LOGIN && \
+	       docker push $(repo)/$(image):$(version)

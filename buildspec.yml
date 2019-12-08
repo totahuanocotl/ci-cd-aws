@@ -2,11 +2,11 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      docker: 18
+      golang: 1.12
   build:
     commands:
       - "echo resolved source version: $CODEBUILD_RESOLVED_SOURCE_VERSION"
       - "echo source version: $CODEBUILD_SOURCE_VERSION"
-      - make docker-push $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - make docker-push VERSION=$CODEBUILD_RESOLVED_SOURCE_VERSION
 artifacts:
   files: []

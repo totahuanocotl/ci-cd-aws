@@ -15,3 +15,6 @@
 # vendor/
 *.iml
 .idea
+/resources/compiled/
+/resources/build/
+/resources/refs/hello_world/docker_image

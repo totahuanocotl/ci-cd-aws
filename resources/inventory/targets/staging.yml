@@ -1,0 +1,9 @@
+classes:
+  - common
+  - hello_world
+  - cluster
+
+parameters:
+  cluster:
+    context: staging
+  target_name: staging

@@ -1,0 +1,30 @@
+parameters:
+  hello_world:
+    namespace: hello-world
+    image: ?{plain:hello_world/docker_image}
+    port: 8080
+    debug: true
+  kapitan:
+    compile:
+      - output_path: manifests/pre-deploy
+        input_type: jsonnet
+        output_type: yaml
+        input_paths:
+          - components/hello_world/namespace.jsonnet
+
+      - output_path: manifests
+        input_type: jsonnet
+        output_type: yaml
+        input_paths:
+          - components/hello_world/deployment.jsonnet
+
+      - output_path: scripts
+        input_type: jinja2
+        input_paths:
+          - templates/scripts
+
+      - output_path: .
+        output_type: yaml
+        input_type: jinja2
+        input_paths:
+          - templates/docs

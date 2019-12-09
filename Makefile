@@ -6,14 +6,15 @@ ifdef VERSION
 	version := $(VERSION)
 else
 	git_rev := $(shell git rev-parse --short HEAD)
-	git_tag := $(shell git tag --points-at=$(git_rev) | grep "cni-migration-validator")
+	git_tag := $(shell git tag --points-at=$(git_rev))
 	version := $(if $(git_tag),$(git_tag),dev-$(git_rev))
 endif
 build_time := $(shell date -u)
 ldflags := -X "github.com/totahuanocotl/hello-world/cmd.version=$(version)" -X "github.com/totahuanocotl/hello-world/cmd.buildTime=$(build_time)"
+repo := 241776843775.dkr.ecr.eu-west-1.amazonaws.com/axiltia
+image :=  hello-world
 
-.phony: all setup clean build install check checkformat format vet lint test
-
+.phony: all setup clean resources/build install check checkformat format vet lint test docker-build docker-push
 
 all : install check
 check : checkformat vet lint test
@@ -67,6 +68,31 @@ test: install
 	@echo "== test"
 	go test -race $(pkgs)
 
-docker:
-	@echo "== docker"
-	docker build -t local/hello-world .
+docker-build:
+	@echo "== docker-build"
+	docker build \
+           --build-arg VERSION=$(version) \
+	       -t local/$(image) \
+	       -t $(repo)/$(image):$(version) \
+	       .
+docker-push: docker-build
+	@echo "== docker-push"
+	@echo "Running 'aws ecr get-login' && docker push ..."
+	@LOGIN=$$(aws ecr get-login --no-include-email --region eu-west-1) && \
+	       $$LOGIN && \
+	       docker push $(repo)/$(image):$(version)
+
+kapitan:
+	@echo "== kapitan"
+	@mkdir -p resources/build
+	@echo -n $(repo)/$(image):$(version) > resources/build/docker_image
+	# SHA for version 0.26.0
+	whoami
+	cat /etc/passwd
+	docker run --rm -v `pwd`/resources:/src:delegated  --entrypoint "" deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
+    	       bash -c 'cat /etc/passwd && ls -alrt'
+
+	docker run --rm -v `pwd`/resources:/src:delegated  deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
+	       refs --write plain:hello_world/docker_image -f build/docker_image
+	docker run --rm -v `pwd`/resources:/src:delegated deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
+	       compile --prune

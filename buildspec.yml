@@ -18,6 +18,6 @@ phases:
       - make kapitan VERSION=$CODEBUILD_RESOLVED_SOURCE_VERSION
 artifacts:
   files:
-    - /**/*
+    - ./**/*
   discard-paths: no
   base-directory: resources/compiled

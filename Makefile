@@ -87,11 +87,6 @@ kapitan:
 	@mkdir -p resources/build
 	@echo -n $(repo)/$(image):$(version) > resources/build/docker_image
 	# SHA for version 0.26.0
-	whoami
-	cat /etc/passwd
-	docker run --rm -v `pwd`/resources:/src:delegated  --entrypoint "" deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
-    	       bash -c 'cat /etc/passwd && ls -alrt'
-
 	docker run --rm -v `pwd`/resources:/src:delegated  deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
 	       refs --write plain:hello_world/docker_image -f build/docker_image
 	docker run --rm -v `pwd`/resources:/src:delegated deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \

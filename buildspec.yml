@@ -10,15 +10,14 @@ phases:
     commands:
       - "echo resolved source version: $CODEBUILD_RESOLVED_SOURCE_VERSION"
       - "echo source version: $CODEBUILD_SOURCE_VERSION"
+      - make setup
       - make docker-push VERSION=$CODEBUILD_RESOLVED_SOURCE_VERSION
   post_build:
     commands:
-      - ls -lart
       - chmod -R 0777 resources
-      - ls -lart
       - make kapitan VERSION=$CODEBUILD_RESOLVED_SOURCE_VERSION
 artifacts:
   files:
-    - resources/compiled/**/*
+    - /**/*
   discard-paths: no
-  base-directory: .
+  base-directory: resources/compiled

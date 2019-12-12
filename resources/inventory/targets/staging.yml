@@ -5,5 +5,5 @@ classes:
 
 parameters:
   cluster:
-    context: wellcome
+    name: wellcome
   target_name: staging

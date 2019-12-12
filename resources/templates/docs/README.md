@@ -1,7 +1,8 @@
-# My Readme
+# Readme
 
 Target: {{ target }}
 
+Deploys a simple app.
 # INVENTORY
 
 ```

@@ -1,0 +1,10 @@
+classes:
+  - common
+  - hello_world
+  - cluster
+
+parameters:
+  cluster:
+    name: wellcome
+  target_name: dev
+  environment: dev

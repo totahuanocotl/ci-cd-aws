@@ -27,6 +27,12 @@ local deployment = kube.Deployment("hello-world") {
     }
 };
 
+local service = kube.Service("hello-world") {
+ target_pod: deployment.spec.template
+};
+
 {
-    "hello-world-deployment": deployment
+    "hello-world-deployment": deployment,
+    "hello-world-service": service,
+
 }

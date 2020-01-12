@@ -9,9 +9,16 @@ else
 	git_tag := $(shell git tag --points-at=$(git_rev))
 	version := $(if $(git_tag),$(git_tag),dev-$(git_rev))
 endif
+
+ifdef ENVIRONMENT
+	environment=$(ENVIRONMENT)
+else
+	environment=dev
+endif
+
 build_time := $(shell date -u)
 ldflags := -X "github.com/totahuanocotl/hello-world/cmd.version=$(version)" -X "github.com/totahuanocotl/hello-world/cmd.buildTime=$(build_time)"
-repo := 241776843775.dkr.ecr.eu-west-1.amazonaws.com/axiltia
+repo := 241776843775.dkr.ecr.eu-west-1.amazonaws.com/axiltia/$(environment)
 image :=  hello-world
 
 .phony: all setup clean resources/build install check checkformat format vet lint test docker-build docker-push
@@ -84,10 +91,10 @@ docker-push: docker-build
 
 kapitan:
 	@echo "== kapitan"
-	@mkdir -p resources/build
-	@echo -n $(repo)/$(image):$(version) > resources/build/docker_image
+	@mkdir -p resources/build/$(environment)
+	@echo -n $(repo)/$(image):$(version) > resources/build/$(environment)/docker_image
 	# SHA for version 0.26.0
 	docker run --rm -v `pwd`/resources:/src:delegated  deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
-	       refs --write plain:hello_world/docker_image -f build/docker_image
+	       refs --write plain:hello_world/docker_image -f build/$(environment)/docker_image
 	docker run --rm -v `pwd`/resources:/src:delegated deepmind/kapitan@sha256:5ac2f06f06794ad84d7710b0499a41476737d9fe7a4fd1961f077ed18d4d01d7 \
-	       compile --prune
+	       compile --prune --targets $(environment)

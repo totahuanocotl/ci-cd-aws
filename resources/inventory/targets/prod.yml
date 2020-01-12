@@ -5,5 +5,6 @@ classes:
 
 parameters:
   cluster:
-    name: wellcome
-  target_name: staging
+    name: wellcome-prod
+  target_name: prod
+  environment: prod
